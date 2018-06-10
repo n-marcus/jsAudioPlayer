@@ -1,0 +1,78 @@
+@font-face {
+  font-family: 'Factory LJDS';
+  src: url('fonts/Factory LJDS.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'FactoryLJDS';
+  src: url('fonts/FactoryLJDS.woff') format('woff'),
+  url('FactoryLJDS.svg#FactoryLJDS') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --totalWidth: 80vw;
+  --totalHeight: 20vw;
+  --infoHeight: 5vw;
+  --playerHeight: 25vw;
+}
+
+body {
+  font-family: "FactoryLJDS", sans-serif;
+  font-weight: normal;
+  font-style: normal;
+}
+
+.audio-player-container {
+  position: absolute;
+  left: 10vw;
+  top: 10vw;
+}
+
+.audio-player {
+  width: var(--totalWidth);
+  height: var(--totalHeight);
+  background-color: rgb(50,50,50);
+  display: table-cell;
+}
+
+.play-button {
+  width: var(--infoHeight);
+  height: var(--infoHeight);
+  border-radius: calc(var(--infoHeight) / 2);
+  background-color: hsl(200, 40%, 40%);
+  margin: 1vw;
+  display: inline-block;
+}
+.song-title {
+  font-size: 4vw;
+  color: white;
+  float: right;
+  background-color: rgba(100,100,100,0.5);
+  margin: 1vw;
+  padding: .5vw;
+  border-radius: .5vw;
+  display: inline-block;
+}
+
+.progress-bar {
+  background-color: grey;
+  /* background-image: url("spectrum.jpg"); */
+  background-size: cover;
+  background-position: bottom;
+  width: var(--totalWidth);
+  height: var(--playerHeight);
+  display: block;
+}
+
+.playhead {
+  /* background: linear-gradient(to right, rgba(0,0,0,0) , white); */
+  background-color:white;
+  width: 1px;
+  height: var(--playerHeight);
+  position: absolute;
+  left: 0vw;
+}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" type="text/css" href="test.css">
+  <!-- <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script> -->
+  <script src="p5.js"></script>
+  <script src="addons\p5.dom.js"> </script>
+  <script src="addons\p5.sound.js"> </script>
+  <script src="FFT.js"></script>
+  <script src="jquery.js"> </script>
+  <script src="player.js"> </script>
+  <script src="imageGen.js"></script>
+</head>
+<body>
+  <h1> This is my audio player</h1>
+  <div class="audio-player-container">
+    <div class="audio-player" id="audio-player" sound="AfrikaMyLand1.wav">
+      <div class="play-button" id="play-button"></div>
+      <div class="song-title" id="song-title">Crow crowing - Je Boi</div>
+      <audio id="audiosource"></audio>
+      <div class="progress-bar" id="progress-bar">
+        <div class="playhead" id="playhead">
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
