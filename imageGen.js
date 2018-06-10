@@ -93,7 +93,7 @@ function compressAudio() {
 }
 
 function calcYPos(i) {
-  return(height - ((sqrt(i *(10 * height))) * 1.1));
+  return(height - ((sqrt(i *(1 * height))) * 1.1) + 10);
 }
 
 function drawFFT() {
@@ -119,7 +119,7 @@ function drawFFT() {
     yPos = height; //y increment per new frequency
     // console.log(spectra[i].length);
     for (var f = 0; f < spectra[i].length; f ++) { //iterate through all frequencies in window
-      amp = (spectra[i][f] * (gain * 2)); ///get amp
+      amp = (spectra[i][f] * (gain * 3.7)); ///get amp
       if (amp > 0.) {
         var color = amp* 255; //fukked up scaling
 
