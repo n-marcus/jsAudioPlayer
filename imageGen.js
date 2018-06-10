@@ -2,8 +2,18 @@
 var compressed = [];
 var spectra;
 var yAxisArray = [];
-var fftSize = 1024;
+var fftSize = 4096;
 var fft = new FFT(fftSize, 44100);
+var fftDrawn = false;
+
+var currentWindow = 0;
+var currentFreq = 0;
+var xWidth, yWidth = 0;
+var xPos = 0;
+var yPos = 0;
+var amp, maxAmps = 0;
+var maxArray = [];
+var gain = 0;
 
 
 function preload() {
@@ -15,12 +25,21 @@ function setup() {
   var width = document.getElementById("progress-bar").offsetWidth;
   var myCanvas = createCanvas(width, height);
   myCanvas.parent("progress-bar");
-  background(0,0,0);
+  background(20);
   // console.log("sound length = " + sound.duration());
   getRawData();
   compressAudio();
   // drawWaveform();
-  drawFFT();
+  // drawFFT();
+
+  xWidth = width / spectra.length;
+  yWidth = height / spectra[0].length;
+  maxArray = [];
+  for (var i = 0; i < spectra.length; i ++) {
+    maxArray[i] = Math.max.apply(null, spectra[i]);
+  }
+  maxAmp = Math.max.apply(null, maxArray);
+  console.log("Starting FFT spectrogram draw");
 }
 
 function getRawData() {
@@ -93,7 +112,7 @@ function compressAudio() {
 }
 
 function calcYPos(i) {
-  return(height - ((sqrt(i *(1 * height))) * 1.1) + 10);
+  return(height - ((sqrt(i *(1 * height))) * 1.1) );
 }
 
 function drawFFT() {
@@ -160,7 +179,29 @@ function drawWaveform() {
 }
 
 function draw() {
-  // background(0,0,0);
-  // drawWaveform();
+  gain = 10.1;
+  noStroke();
+  if (!fftDrawn) {
+    // console.log("Drawing window num " + currentWindow + "drawing at " + xPos + " window = " + currentWindow );
+    for (var i = 0; i < spectra[0].length; i ++ ) {
+      amp = (spectra[currentWindow][i]) * (gain); ///get amp
+      if (amp > 0.001) {
+        // console.log(i);
+        var color = amp * 255;
+        color = color % 255;
+        yPos = calcYPos(i);
+        fill(color, 180, 200,color);
+        // fill(255);
+        rect(xPos, yPos, xWidth, yPos - calcYPos(i - 1));
+      }
+    }
+    xPos += xWidth;
+    currentWindow ++;
+  }
 
+  if (currentWindow > spectra.length - 1)  {
+    fftDrawn = true;
+    console.log("Done drawing the fft spectrogram");
+    noLoop();
+  }
 }
