@@ -5,19 +5,31 @@ var time;
 var _time;
 var perc;
 var soundFilePath = "";
+var fftSize;
+var colorOffset;
 
 // A $( document ).ready() block.
 $(document).ready(function() {
+
   var el = document.getElementById("audio-player");
   var nodes=[], values=[];
   for (var att, i = 0, atts = el.attributes, n = atts.length; i < n; i++){
     att = atts[i];
+    // console.log(att.nodeName);
     if (att.nodeName == "sound") {
-      console.log("sound = " + att.nodeValue);
+      console.log("Loading sound = " + att.nodeValue + "...");
       soundFilePath = att.nodeValue;
     }
-  }
+    if (att.nodeName == "fftsize") {
+      fftSize = Number(att.nodeValue);
+      console.log("Changing fftSize to: " + att.nodeValue);
+    }
+    if (att.nodeName == "coloroffset") {
+      colorOffset = Number(att.nodeValue);
+      console.log("Changing colorOffset to: " + att.nodeValue);
+    }
 
+  }
   myaudio = new Audio(soundFilePath);
   dur = myaudio.duration;
   time = 0;

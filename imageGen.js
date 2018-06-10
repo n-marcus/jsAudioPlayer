@@ -2,8 +2,7 @@
 var compressed = [];
 var spectra;
 var yAxisArray = [];
-var fftSize = 4096;
-var fft = new FFT(fftSize, 44100);
+var fft;
 var fftDrawn = false;
 
 var currentWindow = 0;
@@ -15,6 +14,7 @@ var amp, maxAmps = 0;
 var maxArray = [];
 var gain = 0;
 
+var percRendered = 0;
 
 function preload() {
   sound = loadSound(soundFilePath);
@@ -25,6 +25,9 @@ function setup() {
   var width = document.getElementById("progress-bar").offsetWidth;
   var myCanvas = createCanvas(width, height);
   myCanvas.parent("progress-bar");
+
+  fft = new FFT(fftSize, 44100);
+
   background(20);
   // console.log("sound length = " + sound.duration());
   getRawData();
@@ -116,7 +119,6 @@ function calcYPos(i) {
 }
 
 function drawFFT() {
-
   background(20);
   console.log("drawing fft");
   var xWidth = width / spectra.length;
@@ -181,27 +183,28 @@ function drawWaveform() {
 function draw() {
   gain = 10.1;
   noStroke();
+  colorMode(HSB);
   if (!fftDrawn) {
     // console.log("Drawing window num " + currentWindow + "drawing at " + xPos + " window = " + currentWindow );
     for (var i = 0; i < spectra[0].length; i ++ ) {
       amp = (spectra[currentWindow][i]) * (gain); ///get amp
       if (amp > 0.001) {
-        // console.log(i);
-        var color = amp * 255;
-        color = color % 255;
+        var color = amp * 45;
         yPos = calcYPos(i);
-        fill(color, 180, 200,color);
-        // fill(255);
+        fill(color + colorOffset, 180, 200, amp);
         rect(xPos, yPos, xWidth, yPos - calcYPos(i - 1));
       }
     }
     xPos += xWidth;
     currentWindow ++;
+    var percRendered = int((currentWindow / spectra.length) * 100);
+    document.getElementById("render-perc").innerHTML=(percRendered + "% rendered");
   }
 
   if (currentWindow > spectra.length - 1)  {
     fftDrawn = true;
     console.log("Done drawing the fft spectrogram");
+    document.getElementById("render-perc").innerHTML=(" ");
     noLoop();
   }
 }

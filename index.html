@@ -14,8 +14,9 @@
 <body>
   <h1> This is my audio player</h1>
   <div class="audio-player-container">
-    <div class="audio-player" id="audio-player" sound="sounds/monk.wav">
+    <div class="audio-player" id="audio-player" sound="sounds/monk.wav" fftSize="4096" colorOffset = "140">
       <div class="play-button" id="play-button"></div>
+      <div class="render-perc" id="render-perc">0% rendered</div>
       <div class="song-title" id="song-title">Crow crowing - Je Boi</div>
       <audio id="audiosource"></audio>
       <div class="progress-bar" id="progress-bar">
