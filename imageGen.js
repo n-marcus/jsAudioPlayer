@@ -1,5 +1,10 @@
 // var average = [];
 var compressed = [];
+var spectra;
+var yAxisArray = [];
+var fftSize = 1024;
+var fft = new FFT(fftSize, 44100);
+
 
 function preload() {
   sound = loadSound(soundFilePath);
@@ -11,23 +16,22 @@ function setup() {
   var myCanvas = createCanvas(width, height);
   myCanvas.parent("progress-bar");
   background(0,0,0);
-  fft = new p5.FFT();
-  fft.setInput(sound);
-  console.log("sound length = " + sound.duration());
+  // console.log("sound length = " + sound.duration());
   getRawData();
   compressAudio();
-  drawWaveform();
+  // drawWaveform();
+  drawFFT();
 }
 
 function getRawData() {
   //get raw channel data! Fukking did it
   var buffer = sound.buffer; //get all channels
   var bufferlength = buffer.length;
-  console.log("bufferlength = " + bufferlength);
+  // console.log("bufferlength = " + bufferlength);
   average = [];
   // average = Array.apply(null, Array(bufferlength)).map(Number.prototype.valueOf,0);; //zeros array for averaging out all channels of this audio file
   for (var c = 0; c < buffer.numberOfChannels; c ++) {
-    console.log("getting data for channel " + c);
+    // console.log("getting data for channel " + c);
     var chan = buffer.getChannelData(0); //get one get one channel
     for (let i = 0; i < chan.length; i ++) {
       if (c == 0) { // if this is the first channel we analyse fill everything with zeros
@@ -42,13 +46,16 @@ function getRawData() {
   // console.log(average);
 }
 
-
 function compressAudio() {
   //iterate through audio file in windows and average those windows out to create a smaller version of the rawData
   var originalLength = average.length;
-  var windowSize  = 512; // this is how many audio samples should exist per window
+  // var numberOfWindows = width * 4;
+  // var windowSize = Math.round(originalLength / numberOfWindows) -1;
+
+  var windowSize = fftSize; // this is how many audio samples should exist per window MUST BE MULTIPLE OF 2
   var numberOfWindows = Math.round(originalLength / windowSize) - 1; //we do not analyse the last window cause that will result in analysing non-existing data
   compressed = []
+  spectra = new Array(numberOfWindows);
   var total = 0; // total
   var sampleInFile = 0;
   console.log("Orignal length of audio file: " + originalLength + " windowSize: " + windowSize + " so we create " + numberOfWindows + " windows" );
@@ -59,29 +66,84 @@ function compressAudio() {
     var endSampleInFile = sampleInFile + windowSize; // this is were the current window should end
 
     //this is where I would do some RMS normalization but I have no clue how to do that
-
+    var buffer = [];
+    var bufferIndex = 0;
     for (var sample = sampleInFile; sample < endSampleInFile; sample ++) { //scrolling through the window
+      buffer[bufferIndex] = average[sample]; //make a buffer for fft to analyse
       total += average[sample];
+      bufferIndex ++;
+    }
+
+    fft.forward(buffer);
+    var spectrum = fft.spectrum;
+    // console.log(spectrum);
+    spectra[w] = []; //this is an initializer for a 2d array because javascript is weird, doesnt work without this
+    for (var f = 0; f < spectrum.length; f++) {
+
+      // console.log("amp of freq " + f + " in window " + w + " = " +  spectrum[f]);
+      spectra[w][f] = parseFloat(spectrum[f]);
+
+
     }
     total = total / windowSize;
     // console.log("Total for window " + w + " is " + total);
     compressed[w] = total; // add this window to the array of compressed audio
   }
-  console.log("Compressed audio!" );
-  // console.log(compressed);
+  console.log("Compressed and fft'ed audio!" );
 }
+
+function calcYPos(i) {
+  return(height - ((sqrt(i *(10 * height))) * 1.1));
+}
+
+function drawFFT() {
+
+  background(20);
+  console.log("drawing fft");
+  var xWidth = width / spectra.length;
+  var yWidth = height / spectra[0].length;
+  var xPos = 0;
+  var yPos = height;
+  var amp = 0.;
+  var maxArray = [];
+  for (var i = 0; i < spectra.length; i ++) {
+    maxArray[i] = Math.max.apply(null, spectra[i]);
+  }
+  var maxAmp = Math.max.apply(null, maxArray);
+  var gain = 1 / maxAmp;
+  console.log("maxAmp = " + maxAmp + " gain = " + gain);
+  noStroke();
+  colorMode(HSB);
+  for (var i = 0; i < spectra.length; i ++) { //iterate through all windows
+    xPos += xWidth; //width per window
+    yPos = height; //y increment per new frequency
+    // console.log(spectra[i].length);
+    for (var f = 0; f < spectra[i].length; f ++) { //iterate through all frequencies in window
+      amp = (spectra[i][f] * (gain * 2)); ///get amp
+      if (amp > 0.) {
+        var color = amp* 255; //fukked up scaling
+
+        // console.log("drawing at " + xPos + ", " + yPos + "color " + color);
+        yPos = calcYPos(f);
+        // yPos -=
+        // console.log(yPos);
+        fill(255- color, 180, 200, color);
+        rect(xPos, yPos, xWidth, yPos - calcYPos(f-1));
+      }
+    }
+  }
+}
+
 
 
 function drawWaveform() {
   //draws a nice full window waveform of the loaded file
-  background(0);
+  background(20);
   var xWidth = width / compressed.length;
-  var maxes = [abs(Math.min.apply(null, compressed)), abs(Math.max.apply(null, compressed))];
+  var maxes = [abs(Math.min.apply(null, compressed)),     abs(Math.max.apply(null, compressed))];
   var max = Math.max.apply(null, maxes);
   var gain = 1 / max;
 
-  console.log("max " + max );
-  console.log(xWidth);
   var xPos = 0;
   for (let i = 0 ; i < compressed.length; i ++) {
     xPos += xWidth;
