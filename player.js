@@ -82,7 +82,7 @@ function progressBarClicked(x) {
 
   var newPerc = x / totalWidth;
   var newTime = newPerc * myaudio.duration;
-  console.log("progressbar has been clicked at pos" + x + " new perc = " + newPerc + " new time = " + newTime);
+  // console.log("progressbar has been clicked at pos" + x + " new perc = " + newPerc + " new time = " + newTime);
   if (newTime > 0) {
     myaudio.currentTime = newTime;
   }
